@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Governance Readiness Check | SMC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  /* Approved SMC brand palette only, per Brand & Design Governance Guide v6.0 */
+  :root {
+    --navy: #07344C;      /* SMC Navy */
+    --green: #97CB59;     /* SMC Green */
+    --azure: #237B9B;     /* SMC Azure */
+    --lightblue: #84CFEB; /* SMC Light Blue */
+    --grey: #BFBFBF;      /* SMC Grey */
+    --lightgrey: #F7F7F7; /* SMC Light Grey */
+    --black: #000000;
+    --white: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--white);
+    font-family: 'Inter', sans-serif;
+    color: var(--black);
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    min-height: 100vh;
+  }
+
+  .logo-img {
+    height: 32px;
+    width: auto;
+    display: block;
+    margin-bottom: 28px;
+  }
+
+  h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: clamp(26px, 5vw, 34px);
+    line-height: 1.2;
+    margin: 0 0 12px;
+    color: var(--azure);
+    letter-spacing: -0.01em;
+  }
+  .sub {
+    color: var(--black);
+    opacity: 0.75;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0 0 36px;
+    max-width: 50ch;
+    font-weight: 400;
+  }
+  .progress-dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 36px;
+  }
+  .dot {
+    height: 4px;
+    flex: 1;
+    background: var(--lightgrey);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .dot::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--green);
+    transition: width 0.4s ease;
+  }
+  .dot.done::after { width: 100%; }
+  .dot.current::after { width: 100%; }
+  .card {
+    background: var(--white);
+    border: 1px solid var(--lightgrey);
+    border-radius: 14px;
+    padding: 32px;
+    margin-bottom: 20px;
+  }
+  .q-number {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--azure);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .q-text {
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 0 0 24px;
+    color: var(--azure);
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option {
+    text-align: left;
+    background: var(--lightgrey);
+    border: 1.5px solid var(--lightgrey);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--black);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+  .option:hover {
+    border-color: var(--green);
+    background: var(--white);
+  }
+  .option:active { transform: scale(0.99); }
+  .option:focus-visible {
+    outline: 2px solid var(--azure);
+    outline-offset: 2px;
+  }
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .back-link {
+    background: none;
+    border: none;
+    color: var(--black);
+    opacity: 0.6;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 0;
+  }
+  .back-link:hover { opacity: 1; }
+  .back-link:disabled { opacity: 0; pointer-events: none; }
+
+  /* Intro screen */
+  .intro-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px;
+  }
+  .intro-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--lightgrey);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--black);
+  }
+  .intro-list li:last-child { border-bottom: none; }
+  .intro-num {
+    color: var(--azure);
+    font-weight: 700;
+    font-size: 14px;
+    min-width: 18px;
+  }
+
+  /* Buttons — pill shape per brand guide, centred, Inter SemiBold */
+  .btn-primary {
+    background: var(--green);
+    color: var(--navy);
+    border: none;
+    border-radius: 999px;
+    padding: 16px 30px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    display: inline-block;
+    text-align: center;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 999px;
+    padding: 15px 30px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+  }
+  .btn-secondary:hover { opacity: 0.9; }
+  .btn-ghost {
+    background: none;
+    border: 1.5px solid rgba(255,255,255,0.4);
+    color: var(--white);
+    border-radius: 999px;
+    padding: 14.5px 30px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+  }
+  .btn-ghost:hover { border-color: var(--white); }
+
+  /* Results screen */
+  .gauge-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0 8px;
+  }
+  .gauge-score {
+    font-size: 46px;
+    font-weight: 900;
+    text-align: center;
+    margin: 4px 0 0;
+    color: var(--azure);
+  }
+  .gauge-max {
+    font-size: 18px;
+    color: var(--black);
+    opacity: 0.55;
+    font-weight: 500;
+  }
+  .tier-label {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin: 4px 0 28px;
+  }
+  .tier-desc {
+    text-align: center;
+    color: var(--black);
+    opacity: 0.75;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 48ch;
+    margin: 0 auto 32px;
+  }
+  .breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .breakdown-row {
+    display: grid;
+    grid-template-columns: 1fr 90px;
+    align-items: center;
+    gap: 12px;
+  }
+  .breakdown-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--black);
+  }
+  .breakdown-bar {
+    height: 8px;
+    background: var(--lightgrey);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .breakdown-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+  .cta-block {
+    background: var(--navy);
+    border-radius: 14px;
+    padding: 28px 28px 32px;
+    text-align: center;
+  }
+  .cta-block h3 {
+    color: var(--lightblue);
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0 0 10px;
+  }
+  .cta-block p {
+    color: var(--white);
+    opacity: 0.85;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 22px;
+  }
+  .cta-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .email-capture {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    text-align: center;
+  }
+  .email-capture p {
+    font-size: 13px;
+    color: var(--white);
+    opacity: 0.75;
+    margin: 0 0 12px;
+  }
+  .email-row {
+    display: flex;
+    gap: 8px;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .email-row input {
+    flex: 1;
+    border: none;
+    border-radius: 999px;
+    padding: 12px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+  }
+  .email-row input:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 1px;
+  }
+  .email-row button {
+    background: var(--green);
+    color: var(--navy);
+    border: none;
+    border-radius: 999px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .email-row button:hover { opacity: 0.85; }
+  .email-confirm {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- INTRO SCREEN -->
+  <div class="screen active" id="screen-intro">
+    <img class="logo-img" src="https://www.sm-c.com.au/wp-content/uploads/2025/11/smc-logo.svg" alt="SMC - Solution Minds Consulting">
+    <h1>Can you prove your systems are actually under control?</h1>
+    <p class="sub">Five questions, based on the same governance disciplines behind successful Payday Super go-lives. Takes about two minutes.</p>
+    <ul class="intro-list">
+      <li><span class="intro-num">01</span> Clear ownership and decision-making</li>
+      <li><span class="intro-num">02</span> Meaningful testing and acceptance</li>
+      <li><span class="intro-num">03</span> Reliable payroll and employee data</li>
+      <li><span class="intro-num">04</span> Shared accountability across the business</li>
+      <li><span class="intro-num">05</span> Ongoing review after go-live</li>
+    </ul>
+    <button class="btn-primary" onclick="startQuiz()">Start the check</button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div class="screen" id="screen-quiz">
+    <img class="logo-img" src="https://www.sm-c.com.au/wp-content/uploads/2025/11/smc-logo.svg" alt="SMC - Solution Minds Consulting">
+    <div class="progress-dots" id="progress-dots"></div>
+    <div class="card">
+      <div class="q-number" id="q-number"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+    </div>
+    <div class="nav-row">
+      <button class="back-link" id="back-btn" onclick="goBack()">&larr; Back</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div class="screen" id="screen-results">
+    <img class="logo-img" src="https://www.sm-c.com.au/wp-content/uploads/2025/11/smc-logo.svg" alt="SMC - Solution Minds Consulting">
+    <h1 style="text-align:center; font-size: 22px; margin-bottom: 28px;">Your results</h1>
+
+    <div class="gauge-wrap">
+      <svg id="gauge-svg" width="220" height="130" viewBox="0 0 220 130">
+        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#F7F7F7" stroke-width="14" stroke-linecap="round"/>
+        <path id="gauge-fill" d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#97CB59" stroke-width="14" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283"/>
+        <line id="gauge-needle" x1="110" y1="110" x2="110" y2="35" stroke="#07344C" stroke-width="4" stroke-linecap="round" transform="rotate(-90 110 110)"/>
+        <circle cx="110" cy="110" r="7" fill="#07344C"/>
+      </svg>
+    </div>
+    <div class="gauge-score" id="score-display">0 <span class="gauge-max">/ 25</span></div>
+    <div class="tier-label" id="tier-label"></div>
+    <p class="tier-desc" id="tier-desc"></p>
+
+    <div class="breakdown" id="breakdown"></div>
+
+    <div class="cta-block">
+      <h3 id="cta-heading">Ready to close the gap?</h3>
+      <p>An independent, structured read on exactly where you stand is one conversation away.</p>
+      <div class="cta-buttons">
+        <a class="btn-primary" href="https://www.sm-c.com.au/book-a-free-consultation/" style="text-decoration:none;">Talk to an SMC consultant</a>
+        <a class="btn-ghost" href="#" style="text-decoration:none;" onclick="return false;">Read the full governance checklist</a>
+      </div>
+      <div class="email-capture">
+        <p>Want your results sent to you as well?</p>
+        <div class="email-row">
+          <input type="email" id="email-input" placeholder="you@company.com.au" />
+          <button onclick="sendResults()">Email me</button>
+        </div>
+        <div class="email-confirm" id="email-confirm" style="display:none;">Saved. We'll only use this to send your results.</div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top: 24px;">
+      <button class="back-link" onclick="restartQuiz()">Start over</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    text: "If a major system change (like Payday Super) needed a Go / No-Go call, is there a named person or group with clear authority to make it?",
+    key: "Ownership",
+    options: [
+      { label: "No, it's assumed someone will handle it", value: 1 },
+      { label: "Loosely, but not formally assigned", value: 3 },
+      { label: "Yes, named and understood by the business", value: 5 },
+    ]
+  },
+  {
+    text: "Before relying on a new or changed system in production, do you run a real end-to-end test cycle, not just confirm an update installed?",
+    key: "Testing",
+    options: [
+      { label: "Rarely, we mostly trust the vendor", value: 1 },
+      { label: "Sometimes, depending on the project", value: 3 },
+      { label: "Yes, consistently, with clear pass/fail criteria", value: 5 },
+    ]
+  },
+  {
+    text: "How confident are you that employee and payroll data (fund details, records, configuration) is accurate and actively maintained?",
+    key: "Data quality",
+    options: [
+      { label: "Not very, we assume it's mostly right", value: 1 },
+      { label: "Fairly, but no regular review process", value: 3 },
+      { label: "Very, it's treated as an ongoing responsibility", value: 5 },
+    ]
+  },
+  {
+    text: "If something went wrong, would finance, payroll, and leadership all have visibility, or would it sit with one team alone?",
+    key: "Accountability",
+    options: [
+      { label: "One team alone would likely find out first", value: 1 },
+      { label: "Some visibility, but not consistently shared", value: 3 },
+      { label: "Shared visibility across the relevant teams", value: 5 },
+    ]
+  },
+  {
+    text: "After a major go-live, do you track adoption, confidence, and issues in the weeks that follow, not just whether day one worked?",
+    key: "Ongoing review",
+    options: [
+      { label: "No, once it's live we move on", value: 1 },
+      { label: "Informally, if something comes up", value: 3 },
+      { label: "Yes, with a deliberate review cadence", value: 5 },
+    ]
+  }
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  showScreen('screen-quiz');
+  renderDots();
+  renderQuestion();
+}
+
+function renderDots() {
+  const wrap = document.getElementById('progress-dots');
+  wrap.innerHTML = '';
+  questions.forEach((q, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < current ? ' done' : i === current ? ' current' : '');
+    wrap.appendChild(d);
+  });
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('q-number').textContent = `Question ${current + 1} of ${questions.length}`;
+  document.getElementById('q-text').textContent = q.text;
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt.label;
+    btn.onclick = () => selectAnswer(opt.value);
+    opts.appendChild(btn);
+  });
+  document.getElementById('back-btn').disabled = current === 0;
+  renderDots();
+}
+
+function selectAnswer(value) {
+  answers[current] = value;
+  if (current < questions.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function goBack() {
+  if (current > 0) {
+    current--;
+    renderQuestion();
+  }
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  showScreen('screen-intro');
+}
+
+function showResults() {
+  showScreen('screen-results');
+  const total = answers.reduce((a, b) => a + b, 0);
+  const max = questions.length * 5;
+  const pct = total / max;
+
+  document.getElementById('score-display').innerHTML = `${total} <span class="gauge-max">/ ${max}</span>`;
+
+  const fill = document.getElementById('gauge-fill');
+  const dashOffset = 283 - (283 * pct);
+  setTimeout(() => { fill.style.transition = 'stroke-dashoffset 0.8s ease'; fill.style.strokeDashoffset = dashOffset; }, 100);
+  const needle = document.getElementById('gauge-needle');
+  const angle = -90 + (180 * pct);
+  needle.setAttribute('transform', `rotate(${angle} 110 110)`);
+
+  /* Tier colours use only approved brand colours: Green, Azure, Navy.
+     No invented warning/alert colours, per "no bright secondary colours". */
+  let tier, desc, color;
+  if (total >= 21) {
+    tier = 'Governed';
+    color = '#97CB59';
+    desc = "This is a strong governance foundation, close to the discipline we saw at Peoplecare's go-lives. Worth maintaining the review cadence rather than assuming it holds on its own.";
+  } else if (total >= 13) {
+    tier = 'Partially Governed';
+    color = '#237B9B';
+    desc = "Some real disciplines are in place, but there are gaps that tend to surface under pressure, exactly the conditions Payday Super created nationally.";
+  } else {
+    tier = 'Exposed';
+    color = '#07344C';
+    desc = "Compliance may be fine. Governance is the open question. This is the pattern behind most payroll failures that become public.";
+  }
+  document.getElementById('tier-label').textContent = tier;
+  document.getElementById('tier-label').style.color = color;
+  document.getElementById('tier-desc').textContent = desc;
+
+  const breakdown = document.getElementById('breakdown');
+  breakdown.innerHTML = '';
+  questions.forEach((q, i) => {
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    const barPct = (answers[i] / 5) * 100;
+    row.innerHTML = `
+      <div>
+        <div class="breakdown-label">${q.key}</div>
+        <div class="breakdown-bar"><div class="breakdown-fill" style="width:0%"></div></div>
+      </div>
+      <div style="text-align:right; font-weight:700; color:#000000;">${answers[i]} / 5</div>
+    `;
+    breakdown.appendChild(row);
+    setTimeout(() => {
+      row.querySelector('.breakdown-fill').style.width = barPct + '%';
+    }, 150);
+  });
+}
+
+function sendResults() {
+  const email = document.getElementById('email-input').value;
+  if (!email || !email.includes('@')) {
+    document.getElementById('email-input').focus();
+    return;
+  }
+  // NOTE: this currently just confirms locally. To actually send an email,
+  // this needs a backend endpoint (e.g. a small webhook, similar to the
+  // GitHub Actions email script) to POST the email + score to.
+  document.getElementById('email-confirm').style.display = 'block';
+  document.getElementById('email-input').disabled = true;
+}
+</script>
+</body>
+</html>
